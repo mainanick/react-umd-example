@@ -1,0 +1,118 @@
+<head>
+  <meta charset="utf-8">
+  <script crossorigin  src="https://unpkg.com/react@16.2.0/umd/react.development.js"></script>
+  <script crossorigin  src="https://unpkg.com/react-dom@16.2.0/umd/react-dom.development.js"></script>
+  <script crossorigin  src="https://unpkg.com/create-react-class@15.6.3/create-react-class.min.js"></script>
+  <script crossorigin  src="https://unpkg.com/es6-object-assign@1.1.0/dist/object-assign.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+</body>
+
+<script>
+  var h = React.createElement;
+  
+  var todos = [{
+    name: "Take shower",
+    completed: true
+  },
+  {
+    name: "Blog about react",
+    completed: true
+  },
+  {
+    name: "Watch Movie",
+    completed: false
+  },  
+  {
+    name: "Haircut",
+    completed: false
+  }];  
+
+  function Todo(props) {
+    var isTaskCompleted = props.todo.completed;
+    return h(
+      "li",
+      {style: {textDecoration: isTaskCompleted? "line-through": "none"}},
+      props.todo.name,
+      isTaskCompleted? " ✔️": " ❌ "
+    );
+  }
+  
+  function TodoList(props) {
+    var listOfTodoItems = props.todos.map((todo, index) => {
+      return h(
+        Todo,
+        {key: index, todo},
+      )
+    })
+    return h(
+      "ul",
+      null,
+      listOfTodoItems
+    );
+  }
+  
+  function TodoInput(props) {
+    return h(
+      "form",
+      {onSubmit: props.addTodo},
+      h(
+        "input",
+        {onChange: props.onAddTodoChange, value: props.value}
+      ),
+      h(
+        "button",
+        {type: "submit"},
+        "Add Todo"
+      )
+    );
+  }
+  
+  var TodoContainer = createReactClass({
+    displayName: "TodoContainer",
+    
+    getInitialState(){
+      return Object.assign({}, {todos}, {form:{}});
+    },
+    
+    onAddTodoChange(ev){      
+      this.setState({form:{name: ev.target.value, completed:false}});
+    },
+    
+    addTodo(ev){
+      ev.preventDefault();
+      
+      if(this.state.form && !this.state.form.name) return;
+      
+      var todos = Object.assign([], this.state.todos);
+      todos.push(this.state.form)
+      
+      this.setState({form: {}, todos});
+    },
+    
+    render(){
+      return (
+        h(
+          React.Fragment, 
+          null,
+          h(
+            TodoInput,
+            {
+              value: this.state.form.name || "",
+              onAddTodoChange: this.onAddTodoChange,
+              addTodo: this.addTodo
+            }
+          ),
+          h(TodoList, this.state)
+        )
+      )
+    }
+  
+  });
+  
+  ReactDOM.render(
+    h(TodoContainer),
+    document.getElementById('root')
+  );
+</script>
